@@ -1,25 +1,81 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from "react";
 import './App.css';
+import getCountries from "./services/countries";
+import getCities from "./services/cities";
+import getCitiyWeather from "./services/weather";
 
-function App() {
+
+const App = () => { 
+  const [ countries, setCountries] = useState([]);
+  const [ cities, setCities] = useState([]);
+  const [ weather, setWeather] = useState(null);
+  
+  useEffect(() => {
+    (async () => {
+      setCountries(await getCountries());
+    })();
+  }, []);
+
+  const countryHandler = async e => {
+    e.currentTarget.value && setCities(await getCities(e.currentTarget.value));
+    setWeather(null);
+  }
+  const cityHandler = async e => e.currentTarget.value && setWeather(await getCitiyWeather(e.currentTarget.value));
+  console.log(JSON)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content flex-col ">
+          <div className="text-center lg:text-left">
+            <h1 className="text-5xl font-bold">Pronóstico del tiempo</h1>
+            <p className="py-6">detalle pronóstico</p>
+          </div>
+          <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+            <div className="card-body">
+          
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Elige un país</span>
+              </label>
+              <select onChange={countryHandler} className='input input-bordered'>
+                  <option value="">Seleccionar</option>
+                {countries.map(country => <option key={country.cca2} value={country.cca2}> {country.name.common} </option>)}
+              </select>
+            </div>
+          
+          {cities.length > 0 && (
+            <div className="form-control">
+              <label className="label" >
+                <span className="label-text">Ahora, elige una ciudad...</span>
+              </label>
+                <select onChange={cityHandler} className="input input-bordered">
+                <option value="">Seleccionar</option>
+                {cities.map(city => <option key={city.id}> {city.name} </option>)}
+              </select>
+            </div>
+          )}
+            </div>
+          </div>
+          { weather && (
+            <div className="card w-96 h-56 bg-base-100 shadow-xl image-full"> 
+                <figure><img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt='weather icon'/></figure>
+                <div className="card-body">
+                  <p>desc clima o nCiudad</p>
+                  <div>
+                    <h2 className=" text-right">Actual: { weather.main.temp.toFixed()}ºC</h2>
+                    <h2 className=" text-right">Máxima: {weather.main.temp_max.toFixed()}ºC</h2>
+                    <h2 className=" text-right">Mínima: {weather.main.temp_min.toFixed()}ºC</h2>
+                  </div>
+                </div>
+            </div>
+          )}
+        </div>
+      </div>
+             
+    </>
   );
 }
 
 export default App;
+ 

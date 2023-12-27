@@ -21,7 +21,7 @@ const App = () => {
     setWeather(null);
   }
   const cityHandler = async e => e.currentTarget.value && setWeather(await getCitiyWeather(e.currentTarget.value));
-  console.log(JSON)
+  console.log(weather)
 
   return (
     <>
@@ -40,10 +40,16 @@ const App = () => {
               </label>
               <select onChange={countryHandler} className='input input-bordered'>
                   <option value="">Seleccionar</option>
-                {countries.map(country => <option key={country.cca2} value={country.cca2}> {country.name.common} </option>)}
+                  {countries
+                    .filter(country => country && country.name && country.name.common)
+                    .sort((a, b) => a.name.common.localeCompare(b.name.common))
+                    .map((country) => (
+                      <option key={country.cca2} value={country.cca2}>
+                        {country.name.common}
+                      </option>
+                  ))}
               </select>
             </div>
-          
           {cities.length > 0 && (
             <div className="form-control">
               <label className="label" >
@@ -51,7 +57,14 @@ const App = () => {
               </label>
                 <select onChange={cityHandler} className="input input-bordered">
                 <option value="">Seleccionar</option>
-                {cities.map(city => <option key={city.id}> {city.name} </option>)}
+                {cities
+                .filter(city => city && city.name)
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((city) => (
+                  <option key={city.id}> 
+                    {city.name} 
+                  </option>
+                  ))}
               </select>
             </div>
           )}
@@ -61,11 +74,10 @@ const App = () => {
             <div className="card w-96 h-56 bg-base-100 shadow-xl image-full"> 
                 <figure><img src={`http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt='weather icon'/></figure>
                 <div className="card-body">
-                  <p>desc clima o nCiudad</p>
+                  <p>{weather.name}</p>
                   <div>
-                    <h2 className=" text-right">Actual: { weather.main.temp.toFixed()}ºC</h2>
-                    <h2 className=" text-right">Máxima: {weather.main.temp_max.toFixed()}ºC</h2>
-                    <h2 className=" text-right">Mínima: {weather.main.temp_min.toFixed()}ºC</h2>
+                    <h2 className=" text-right">Temperatura actual: {weather.main.temp.toFixed()}ºC</h2>
+                    <h2 className=" text-right">Sensación térmica: {weather.main.feels_like.toFixed()}ºC</h2>
                   </div>
                 </div>
             </div>
